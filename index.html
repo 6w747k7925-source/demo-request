@@ -795,7 +795,7 @@ function showReady(filename, blob, onSaved){
   readyTip.textContent = isIOS
     ? 'Tap Save or share, then choose Mail or Outlook to send it to marketing, or Save to Files to keep a copy.'
     : isAndroid
-      ? 'Tap Save or share, then choose Gmail, Outlook or WhatsApp to send it to marketing, or Download to keep a copy.'
+      ? 'Tap Save or share, then choose Gmail, Outlook or WhatsApp. If no list appears, the file is saved to Downloads: attach it to your email from there.'
       : 'Click Save or share to download the file.';
   readyMsg.textContent = '';
   readyOverlay.classList.add('show');
@@ -1031,104 +1031,54 @@ async function buildPdf(d){
   return new Blob([await pdf.save()], {type:'application/pdf'});
 }
 
-/* ---------- Full pack: one HTML report with every photo and file inside ---------- */
-// This function never runs in the form. Its source is copied into the report, where it makes
-// each photo open large, and each photo and file download with one click.
-function reportRuntime(){
-  document.documentElement.className += ' js';
-  var nojs = document.getElementById('nojs'); if(nojs) nojs.parentNode.removeChild(nojs);
-  function toBlob(dataUrl){
-    var c = dataUrl.indexOf(','), meta = dataUrl.slice(5, c), body = dataUrl.slice(c + 1);
-    var type = meta.split(';')[0] || 'application/octet-stream', bytes, i;
-    if(/;base64/i.test(meta)){ var bin = atob(body); bytes = new Uint8Array(bin.length); for(i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); }
-    else { bytes = new TextEncoder().encode(decodeURIComponent(body)); }
-    return new Blob([bytes], {type: type});
-  }
-  function save(blob, name){
-    if(window.navigator && window.navigator.msSaveOrOpenBlob){ window.navigator.msSaveOrOpenBlob(blob, name); return; }
-    var url = URL.createObjectURL(blob), a = document.createElement('a');
-    a.href = url; a.download = name; a.style.display = 'none';
-    document.body.appendChild(a); a.click(); a.parentNode.removeChild(a);
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
-  }
-  var files = [];
-  var cards = document.querySelectorAll('.att');
-  Array.prototype.forEach.call(cards, function(card){
-    var kind = card.getAttribute('data-kind'), name = card.getAttribute('data-name'), folder = card.getAttribute('data-folder');
-    var src = kind === 'image' ? card.querySelector('img').getAttribute('src') : card.querySelector('a.dl').getAttribute('href');
-    var blob = null;
-    function getBlob(){ if(!blob) blob = toBlob(src); return blob; }
-    files.push({name: name, folder: folder, getBlob: getBlob});
-    Array.prototype.forEach.call(card.querySelectorAll('.js-dl, a.dl'), function(b){
-      b.addEventListener('click', function(e){ e.preventDefault(); save(getBlob(), name); });
-    });
-    Array.prototype.forEach.call(card.querySelectorAll('.js-view'), function(b){
-      b.addEventListener('click', function(e){ e.preventDefault(); openLb(src, name, function(){ save(getBlob(), name); }); });
-    });
-    Array.prototype.forEach.call(card.querySelectorAll('.js-open'), function(b){
-      b.addEventListener('click', function(e){
-        e.preventDefault();
-        var url = URL.createObjectURL(getBlob());
-        var w = window.open(url, '_blank');
-        if(!w) save(getBlob(), name);
-      });
-    });
+/* ---------- Full pack: a .zip folder that opens on any PC, Mac, iPhone or Android ---------- */
+// Inside: the summary PDF, a report page that links to every file, and every photo and PDF as its own file.
+// Real files in a folder open with a normal click in any mail app, unlike buttons inside an HTML attachment.
+function makeZip(entries){ // files stored as-is; photos and PDFs are already compressed
+  const table = [];
+  for(let n = 0; n < 256; n++){ let c = n; for(let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; table[n] = c >>> 0; }
+  const crc32 = b=>{ let x = 0xFFFFFFFF; for(let i = 0; i < b.length; i++) x = table[(x ^ b[i]) & 255] ^ (x >>> 8); return (x ^ 0xFFFFFFFF) >>> 0; };
+  const enc = new TextEncoder(), parts = [], central = [];
+  let offset = 0;
+  entries.forEach(e=>{
+    const nameB = enc.encode(e.name), crc = crc32(e.bytes), size = e.bytes.length;
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, 0, true);
+    h.setUint16(10, 0, true); h.setUint16(12, 0x21, true); h.setUint32(14, crc, true); h.setUint32(18, size, true);
+    h.setUint32(22, size, true); h.setUint16(26, nameB.length, true); h.setUint16(28, 0, true);
+    parts.push(new Uint8Array(h.buffer), nameB, e.bytes);
+    const cd = new DataView(new ArrayBuffer(46));
+    cd.setUint32(0, 0x02014b50, true); cd.setUint16(4, 20, true); cd.setUint16(6, 20, true); cd.setUint16(8, 0x0800, true);
+    cd.setUint16(10, 0, true); cd.setUint16(12, 0, true); cd.setUint16(14, 0x21, true); cd.setUint32(16, crc, true);
+    cd.setUint32(20, size, true); cd.setUint32(24, size, true); cd.setUint16(28, nameB.length, true);
+    cd.setUint32(42, offset, true);
+    central.push(new Uint8Array(cd.buffer), nameB);
+    offset += 30 + nameB.length + size;
   });
-
-  var ov = document.getElementById('lbOverlay'), lbImg = document.getElementById('lbImg'), lbName = document.getElementById('lbName'), lbDl = document.getElementById('lbDl'), lbSave = null;
-  function openLb(src, name, onSave){ lbImg.src = src; lbImg.alt = name; lbName.textContent = name; lbSave = onSave; ov.className = 'lb show'; }
-  function closeLb(){ ov.className = 'lb'; lbImg.removeAttribute('src'); }
-  document.getElementById('lbClose').onclick = closeLb;
-  lbDl.onclick = function(e){ e.preventDefault(); if(lbSave) lbSave(); };
-  ov.addEventListener('click', function(e){ if(e.target === ov) closeLb(); });
-  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLb(); });
-
-  var all = document.getElementById('dlAll');
-  if(all) all.addEventListener('click', function(e){
-    e.preventDefault();
-    var used = {}, entries = [];
-    files.forEach(function(f){
-      var dot = f.name.lastIndexOf('.');
-      var base = dot > 0 ? f.name.slice(0, dot) : f.name, ext = dot > 0 ? f.name.slice(dot) : '';
-      var n = f.folder + '/' + f.name, i = 2;
-      while(used[n.toLowerCase()]){ n = f.folder + '/' + base + ' (' + i + ')' + ext; i++; }
-      used[n.toLowerCase()] = true;
-      entries.push({name: n, blob: f.getBlob()});
-    });
-    Promise.all(entries.map(function(en){ return en.blob.arrayBuffer().then(function(b){ return {name: en.name, bytes: new Uint8Array(b)}; }); }))
-      .then(function(list){ save(makeZip(list), all.getAttribute('data-zip')); });
-  });
-
-  // Small zip writer (files stored as-is; photos and PDFs are already compressed)
-  function makeZip(entries){
-    var table = [], n, k, c;
-    for(n = 0; n < 256; n++){ c = n; for(k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; table[n] = c >>> 0; }
-    function crc32(b){ var x = 0xFFFFFFFF; for(var i = 0; i < b.length; i++) x = table[(x ^ b[i]) & 255] ^ (x >>> 8); return (x ^ 0xFFFFFFFF) >>> 0; }
-    var enc = new TextEncoder(), parts = [], central = [], offset = 0;
-    entries.forEach(function(e){
-      var nameB = enc.encode(e.name), crc = crc32(e.bytes), size = e.bytes.length;
-      var h = new DataView(new ArrayBuffer(30));
-      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, 0, true);
-      h.setUint16(10, 0, true); h.setUint16(12, 0x21, true); h.setUint32(14, crc, true); h.setUint32(18, size, true);
-      h.setUint32(22, size, true); h.setUint16(26, nameB.length, true); h.setUint16(28, 0, true);
-      parts.push(new Uint8Array(h.buffer), nameB, e.bytes);
-      var cd = new DataView(new ArrayBuffer(46));
-      cd.setUint32(0, 0x02014b50, true); cd.setUint16(4, 20, true); cd.setUint16(6, 20, true); cd.setUint16(8, 0x0800, true);
-      cd.setUint16(10, 0, true); cd.setUint16(12, 0, true); cd.setUint16(14, 0x21, true); cd.setUint32(16, crc, true);
-      cd.setUint32(20, size, true); cd.setUint32(24, size, true); cd.setUint16(28, nameB.length, true);
-      cd.setUint32(42, offset, true);
-      central.push(new Uint8Array(cd.buffer), nameB);
-      offset += 30 + nameB.length + size;
-    });
-    var cdSize = 0; central.forEach(function(p){ cdSize += p.length; });
-    var end = new DataView(new ArrayBuffer(22));
-    end.setUint32(0, 0x06054b50, true); end.setUint16(8, entries.length, true); end.setUint16(10, entries.length, true);
-    end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
-    return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), {type: 'application/zip'});
-  }
+  let cdSize = 0; central.forEach(p=>{ cdSize += p.length; });
+  const end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, entries.length, true); end.setUint16(10, entries.length, true);
+  end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
+  return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), {type:'application/zip'});
 }
-
-function buildPackHTML(d){
+function cleanName(s){ return String(s || 'file').replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '-').replace(/^[.\s]+/, '').trim() || 'file'; }
+function packFiles(d){
+  const out = [];
+  ZONES.forEach(z=>{
+    const used = {}, folder = cleanName(ZONE_LABEL[z]);
+    (d.attachments[z] || []).forEach(it=>{
+      const name = cleanName(it.name), dot = name.lastIndexOf('.');
+      const base = dot > 0 ? name.slice(0, dot) : name, ext = dot > 0 ? name.slice(dot) : '';
+      let n = name, i = 2;
+      while(used[n.toLowerCase()]){ n = base + ' (' + i + ')' + ext; i++; }
+      used[n.toLowerCase()] = true;
+      out.push({zone:z, folder, name:n, item:it});
+    });
+  });
+  return out;
+}
+function buildFolderReport(d, files){
+  const rel = f => encodeURIComponent(f.folder) + '/' + encodeURIComponent(f.name);
   const table = rows => '<table>' + rows.map(r=> '<tr><td class="label">' + esc(r[0]) + '</td><td>' + (esc(r[1]) || '—') + '</td></tr>').join('') + '</table>';
   const body = sections(d).map(s=>{
     let h = '<h2>' + esc(s.title) + '</h2>';
@@ -1141,71 +1091,50 @@ function buildPackHTML(d){
     if(s.rowsAfter) h += table(s.rowsAfter);
     return h;
   }).join('');
-
-  let count = 0;
   const att = ZONES.map(z=>{
-    const items = d.attachments[z] || [];
-    if(!items.length) return '';
-    return '<h3>' + esc(ZONE_LABEL[z]) + ' (' + items.length + ')</h3><div class="grid">' + items.map(it=>{
-      count++;
-      const nm = esc(it.name), folder = esc(ZONE_LABEL[z].replace(/[\\/:*?"<>|]+/g, '-'));
-      if(isImageItem(it)){
-        return '<figure class="att" data-kind="image" data-name="' + nm + '" data-folder="' + folder + '">' +
-          '<a href="#" class="thumb js-view" title="Click to enlarge"><img src="' + it.dataUrl + '" alt="' + nm + '"></a>' +
-          '<figcaption><span class="name">' + nm + '</span>' +
-          '<span class="acts js-only"><a href="#" class="btn js-view">View</a><a href="#" class="btn solid js-dl">Download</a></span></figcaption></figure>';
-      }
-      return '<figure class="att" data-kind="file" data-name="' + nm + '" data-folder="' + folder + '">' +
-        '<div class="thumb file"><strong>.' + esc(extOf(it.name)) + '</strong><span>' + nm + '</span></div>' +
-        '<figcaption><span class="name">' + nm + '</span>' +
-        '<span class="acts"><a href="#" class="btn js-open js-only">Open</a><a class="btn solid dl" href="' + it.dataUrl + '" download="' + nm + '">Download</a></span></figcaption></figure>';
+    const list = files.filter(f=> f.zone === z);
+    if(!list.length) return '';
+    return '<h3>' + esc(ZONE_LABEL[z]) + ' (' + list.length + ')</h3><div class="grid">' + list.map(f=>{
+      const href = rel(f), nm = esc(f.name);
+      const thumb = isImageItem(f.item)
+        ? '<a class="thumb" href="' + href + '" target="_blank"><img src="' + href + '" alt="' + nm + '"></a>'
+        : '<a class="thumb file" href="' + href + '" target="_blank"><strong>.' + esc(extOf(f.name)) + '</strong><span>' + nm + '</span></a>';
+      return '<figure>' + thumb + '<figcaption><span class="name">' + nm + '</span><span class="acts"><a class="btn" href="' + href + '" target="_blank">Open</a><a class="btn solid" href="' + href + '" download>Download</a></span></figcaption></figure>';
     }).join('') + '</div>';
   }).join('');
-
-  const zipName = 'demo-request-' + safeName(d) + '-' + requestId + '-attachments.zip';
-  const attBlock = count
-    ? '<h2>Attachments</h2><div class="att-head"><p class="muted">Click a photo to see it full size. Every photo and file has its own Download button.</p>' +
-      '<a href="#" class="btn solid big js-only" id="dlAll" data-zip="' + esc(zipName) + '">Download all ' + count + ' files (.zip)</a></div>' + att
-    : '';
-
   return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>Demo Request ' + esc(requestId) + (d.companyName ? ' — ' + esc(d.companyName) : '') + '</title><style>' +
-    ':root{color-scheme:light}*{box-sizing:border-box}' +
-    'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#26314A;background:#F7F5F0;margin:0;-webkit-text-size-adjust:100%}' +
+    ':root{color-scheme:light}*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#26314A;background:#F7F5F0;margin:0}' +
     '.top{background:#0f4c5c;color:#fff;padding:22px 20px}.top div{max-width:860px;margin:0 auto}.top h1{margin:0 0 4px;font-size:22px;font-weight:600}.top p{margin:0;font-size:12.5px;color:#cfe3e8}' +
-    '.wrap{max-width:860px;margin:0 auto;padding:20px 20px 40px}' +
-    '.nojs{background:#FCEFE9;border-left:4px solid #c1440e;border-radius:4px;padding:12px 14px;font-size:13px;line-height:1.55;margin-bottom:18px}' +
-    '.sheet{background:#fff;border:1px solid #D9D4C7;border-radius:6px;padding:6px 22px 22px}' +
-    'h2{color:#0f4c5c;font-size:14px;border-bottom:2px solid #0f4c5c;padding-bottom:5px;margin:24px 0 0}' +
-    'h3{color:#0f4c5c;font-size:13px;margin:22px 0 8px}' +
+    '.wrap{max-width:860px;margin:0 auto;padding:20px 20px 40px}.sheet{background:#fff;border:1px solid #D9D4C7;border-radius:6px;padding:6px 22px 22px}' +
+    'h2{color:#0f4c5c;font-size:14px;border-bottom:2px solid #0f4c5c;padding-bottom:5px;margin:24px 0 0}h3{color:#0f4c5c;font-size:13px;margin:22px 0 8px}' +
     'table{width:100%;border-collapse:collapse;margin-top:8px}td,th{padding:7px 8px;border-bottom:1px solid #e2e8f0;font-size:13px;vertical-align:top;text-align:left}td.label{color:#5B6478;width:40%}th{font-size:11.5px;color:#5B6478;font-weight:600}' +
     '.notes{font-size:13px;white-space:pre-wrap;line-height:1.55}.muted{color:#5B6478;font-size:12.5px}' +
-    '.att-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px}.att-head p{margin:0}' +
-    '.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}' +
-    '.att{margin:0;border:1px solid #D9D4C7;border-radius:6px;overflow:hidden;background:#FAF8F3;display:flex;flex-direction:column;min-width:0}' +
-    '.thumb{display:block;height:150px;background:#eee;cursor:zoom-in}.thumb img{width:100%;height:100%;object-fit:cover;display:block}' +
-    '.thumb.file{cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#0f4c5c;padding:10px;text-align:center;background:#FAF8F3}.thumb.file strong{font-size:22px}.thumb.file span{font-size:11px;color:#5B6478;word-break:break-word}' +
-    'figcaption{padding:9px 10px;display:flex;flex-direction:column;gap:8px;border-top:1px solid #D9D4C7;background:#fff;flex:1}' +
-    '.name{font-size:11.5px;color:#5B6478;word-break:break-word}.acts{display:flex;gap:6px;flex-wrap:wrap}' +
-    '.btn{display:inline-block;text-decoration:none;border:1px solid #0f4c5c;color:#0f4c5c;background:#fff;border-radius:4px;padding:6px 11px;font-size:12.5px;cursor:pointer}.btn:hover{background:#F0F6F7}' +
-    '.btn.solid{background:#0f4c5c;color:#fff}.btn.solid:hover{background:#0a3540}.btn.big{padding:10px 16px;font-size:13.5px}' +
-    '.js-only{display:none!important}.js .js-only{display:inline-flex!important}.js .acts.js-only{display:flex!important}' +
+    '.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}figure{margin:0;border:1px solid #D9D4C7;border-radius:6px;overflow:hidden;background:#fff;display:flex;flex-direction:column;min-width:0}' +
+    '.thumb{display:block;height:150px;background:#eee}.thumb img{width:100%;height:100%;object-fit:cover;display:block}' +
+    '.thumb.file{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#0f4c5c;padding:10px;text-align:center;background:#FAF8F3;text-decoration:none}.thumb.file strong{font-size:22px}.thumb.file span{font-size:11px;color:#5B6478;word-break:break-word}' +
+    'figcaption{padding:9px 10px;display:flex;flex-direction:column;gap:8px;border-top:1px solid #D9D4C7;flex:1}.name{font-size:11.5px;color:#5B6478;word-break:break-word}.acts{display:flex;gap:6px;flex-wrap:wrap}' +
+    '.btn{display:inline-block;text-decoration:none;border:1px solid #0f4c5c;color:#0f4c5c;background:#fff;border-radius:4px;padding:6px 11px;font-size:12.5px}.btn.solid{background:#0f4c5c;color:#fff}' +
+    '.tip{background:#F0F6F7;border-left:4px solid #0f4c5c;border-radius:4px;padding:10px 14px;font-size:12.5px;margin:16px 0 0;line-height:1.55}' +
     '.rem{background:#FCEFE9;border-left:4px solid #c1440e;padding:10px 14px;font-size:12px;border-radius:4px;margin-top:24px;line-height:1.6}' +
-    '.lb{position:fixed;inset:0;background:rgba(15,25,35,.86);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}.lb.show{display:flex}' +
-    '.lb-in{background:#fff;border-radius:8px;padding:16px;max-width:100%;max-height:100%;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative}' +
-    '.lb-in img{max-width:min(92vw,1200px);max-height:72vh;display:block;border-radius:4px}.lb-name{font-size:12.5px;color:#5B6478;margin:0 34px;text-align:center;word-break:break-word}' +
-    '.lb-x{position:absolute;top:6px;right:8px;border:none;background:none;font-size:26px;color:#5B6478;cursor:pointer;line-height:1}' +
-    '@media(max-width:560px){.top,.wrap{padding-left:14px;padding-right:14px}.sheet{padding:4px 14px 18px}td.label{width:45%}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}' +
-    '@media print{.js-only,.acts,#dlAll,.nojs,.lb{display:none!important}body{background:#fff}.sheet{border:none}.att{break-inside:avoid}}' +
+    '@media(max-width:560px){.top,.wrap{padding-left:14px;padding-right:14px}.sheet{padding:4px 14px 18px}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}' +
+    '@media print{.acts,.tip{display:none}body{background:#fff}.sheet{border:none}figure{break-inside:avoid}}' +
     '</style></head><body>' +
     '<div class="top"><div><h1>Marketing Material &amp; Demo Request</h1><p>Request ID: ' + esc(requestId) + ' &nbsp;|&nbsp; Submitted by: ' + (esc(d.salesRep) || '—') + ' &nbsp;|&nbsp; Date: ' + (esc(d.requestDate) || '—') + '</p></div></div>' +
-    '<div class="wrap">' +
-    (count ? '<div class="nojs" id="nojs"><strong>The download buttons are switched off in this preview.</strong> Save this attachment, then open it in Chrome, Edge or Safari to view and download the photos and files. On a phone you can still press and hold a photo to save it.</div>' : '') +
-    '<div class="sheet">' + body + attBlock + '<div class="rem">' + esc(REMINDER) + '</div></div></div>' +
-    '<div class="lb" id="lbOverlay" role="dialog" aria-modal="true" aria-labelledby="lbName"><div class="lb-in"><button type="button" class="lb-x" id="lbClose" aria-label="Close">&times;</button>' +
-    '<p class="lb-name" id="lbName"></p><img id="lbImg" alt=""><a href="#" class="btn solid" id="lbDl">Download this photo</a></div></div>' +
-    '<script>(' + reportRuntime.toString() + ')();<\/script>' +
-    '</body></html>';
+    '<div class="wrap"><div class="sheet">' + body +
+    (files.length ? '<h2>Attachments</h2><p class="tip">The photos and files are in the folders next to this page. Click any of them to open it, or use Download. If the pictures don’t show, unzip the folder first and open this page from there.</p>' + att : '') +
+    '<div class="rem">' + esc(REMINDER) + '</div></div></div></body></html>';
+}
+async function buildPack(d){
+  const base = 'demo-request-' + safeName(d) + '-' + requestId;
+  const files = packFiles(d);
+  const pdfBlob = await buildPdf(d);
+  const entries = [
+    {name: base + '/Request summary.pdf', bytes: new Uint8Array(await pdfBlob.arrayBuffer())},
+    {name: base + '/Request report.html', bytes: new TextEncoder().encode(buildFolderReport(d, files))}
+  ];
+  files.forEach(f=> entries.push({name: base + '/' + f.folder + '/' + f.name, bytes: dataUrlToBytes(f.item.dataUrl)}));
+  return {blob: makeZip(entries), filename: base + '.zip'};
 }
 
 /* ================= Buttons ================= */
@@ -1237,10 +1166,10 @@ pdfBtn.onclick = ()=> runExport(pdfBtn, 'Preparing PDF…', async d=>{
   if(!window.PDFLib) throw new Error('pdf-lib missing');
   return { blob: await buildPdf(d), filename: 'demo-request-' + safeName(d) + '-' + requestId + '.pdf' };
 });
-packBtn.onclick = ()=> runExport(packBtn, 'Preparing full pack…', async d=>({
-  blob: new Blob([buildPackHTML(d)], {type:'text/html'}),
-  filename: 'demo-request-' + safeName(d) + '-' + requestId + '.html'
-}));
+packBtn.onclick = ()=> runExport(packBtn, 'Preparing full pack…', async d=>{
+  if(!window.PDFLib) throw new Error('pdf-lib missing');
+  return buildPack(d);
+});
 
 document.addEventListener('keydown', e=>{ if(e.key === 'Escape'){ closeReady(); closeLightbox(); closeRequestsPanel(); } });
 
