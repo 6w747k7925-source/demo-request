@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body>
+<title>Marketing Material &amp; Demo Request Form</title>
+<style>
+  /* Layout: single centred form column of numbered cards, sticky action bar at the foot */
+  :root{
+    --navy:#0f4c5c;
+    --navy-dark:#0a3540;
+    --rust:#c1440e;
+    --paper:#F7F5F0;
+    --line:#D9D4C7;
+    --ink:#26314A;
+    --ink-soft:#5B6478;
+    --ok:#5C7A5A;
+    --card:#ffffff;
+    --field:#FDFCF9;
+    --soft:#FAF8F3;
+    --tint:#F0F6F7;
+    --tint-strong:#EAF3F5;
+    --remind:#FCEFE9;
+    --topbar-sub:#cfe3e8;
+    --overlay:rgba(15,25,35,0.82);
+    color-scheme:light;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .topbar{background:var(--navy);color:#fff;padding:22px 24px;}
+  .topbar-inner{max-width:820px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;}
+  .topbar h1{margin:0 0 4px 0;font-size:22px;font-weight:600;text-wrap:balance;}
+  .topbar p{margin:0;font-size:12.5px;color:var(--topbar-sub);}
+  .req-id{font-size:11.5px;color:var(--topbar-sub);text-align:right;font-variant-numeric:tabular-nums;}
+  .wrap{max-width:820px;margin:0 auto;padding:24px 20px 0;}
+  .reminders{background:var(--remind);border-left:4px solid var(--rust);border-radius:4px;padding:14px 16px;margin-bottom:24px;font-size:12.5px;line-height:1.7;}
+  .reminders strong{color:var(--rust);}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:22px 22px 8px;margin-bottom:20px;}
+  .card h2{font-size:15px;margin:0 0 4px 0;color:var(--navy);display:flex;align-items:center;gap:8px;}
+  .card h2 .num{background:var(--navy);color:#fff;font-size:11px;padding:2px 7px;border-radius:3px;font-weight:600;}
+  .card .sub{font-size:11.5px;color:var(--ink-soft);margin:0 0 16px 0;}
+  .field{margin-bottom:16px;min-width:0;}
+  .field > label,.field > .label{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:5px;}
+  .field .hint{font-weight:400;color:var(--ink-soft);font-size:11.5px;}
+  .field input[type=text],.field input[type=number],.field input[type=date],.field input[type=email],.field input[type=tel],.field select,.field textarea{
+    width:100%;border:1px solid var(--line);border-radius:4px;padding:9px 10px;font-size:13.5px;font-family:inherit;color:var(--ink);background:var(--field);
+  }
+  .field textarea{resize:vertical;min-height:60px;}
+  .field input:focus,.field select:focus,.field textarea:focus,table.qty-table input:focus{outline:2px solid var(--navy);outline-offset:-1px;border-color:var(--navy);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .check-group{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:2px;}
+  .check-item{display:flex;align-items:center;gap:6px;font-size:13px;}
+  .check-item input{width:15px;height:15px;flex-shrink:0;accent-color:var(--navy);margin:0;}
+  .check-item label{cursor:pointer;}
+  .check-list{display:flex;flex-direction:column;gap:10px;}
+  .check-list .check-item{background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:9px 11px;align-items:flex-start;}
+  .check-list .check-item label{font-weight:400;font-size:12.5px;line-height:1.5;}
+  .check-list .check-item input{margin-top:2px;}
+  .qty-wrap{overflow-x:auto;}
+  table.qty-table{width:100%;border-collapse:collapse;margin-bottom:12px;}
+  table.qty-table th{text-align:left;font-size:11.5px;color:var(--ink-soft);padding:4px 8px 6px;border-bottom:1px solid var(--line);}
+  table.qty-table td{padding:5px 6px;}
+  table.qty-table input{width:100%;border:1px solid var(--line);border-radius:4px;padding:7px 8px;font-size:13px;font-family:inherit;color:var(--ink);background:var(--field);}
+  .qty-table .rm-row{background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:18px;padding:4px 8px;}
+  .qty-table .rm-row:hover{color:var(--rust);}
+  .add-row-btn{background:none;border:1px dashed var(--line);color:var(--navy);font-size:12.5px;padding:7px 12px;border-radius:4px;cursor:pointer;font-family:inherit;margin-bottom:14px;}
+  .add-row-btn:hover{border-color:var(--navy);background:var(--tint);}
+  .attach-zone{margin-top:8px;border:1.5px dashed var(--line);border-radius:6px;padding:12px;background:var(--field);transition:border-color .15s ease,background .15s ease;}
+  .attach-zone.dragover{border-color:var(--navy);background:var(--tint-strong);}
+  .attach-zone .attach-hint{font-size:11px;color:var(--ink-soft);margin:6px 0 0 0;}
+  .attach-btn{background:#fff;border:1px dashed var(--line);color:var(--navy);font-size:12px;padding:7px 12px;border-radius:4px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;font-weight:400;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
+  .attach-btn:hover{border-color:var(--navy);background:var(--tint);}
+  .attach-btn:focus-visible{outline:2px solid var(--navy);outline-offset:2px;}
+  .vh{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  .attach-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+  .attach-grid:empty{display:none;}
+  .attach-thumb{position:relative;width:76px;height:76px;border-radius:5px;overflow:hidden;border:1px solid var(--line);background:var(--soft);cursor:pointer;}
+  .attach-thumb:hover{border-color:var(--navy);}
+  .attach-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .attach-thumb.file{display:flex;align-items:center;justify-content:center;flex-direction:column;padding:6px;text-align:center;}
+  .attach-thumb.file .ext{font-size:10.5px;font-weight:700;color:var(--navy);text-transform:uppercase;}
+  .attach-thumb.file .fname{font-size:8.5px;color:var(--ink-soft);margin-top:3px;line-height:1.2;word-break:break-word;max-height:24px;overflow:hidden;}
+  .attach-thumb .rm{position:absolute;top:2px;right:2px;width:20px;height:20px;background:rgba(38,49,74,0.75);color:#fff;border:none;border-radius:50%;font-size:13px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+  .attach-thumb .rm:hover{background:var(--rust);}
+  .attach-busy{font-size:11.5px;color:var(--ink-soft);margin-top:8px;}
+
+  .overlay{position:fixed;inset:0;background:var(--overlay);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px;}
+  .overlay.show{display:flex;}
+  #readyOverlay{z-index:1100;}
+  .close-x{position:absolute;top:8px;right:10px;background:none;border:none;font-size:24px;color:var(--ink-soft);cursor:pointer;line-height:1;padding:4px 6px;}
+  .close-x:hover{color:var(--rust);}
+  .lightbox-inner{background:#fff;border-radius:8px;max-width:100%;max-height:92vh;padding:18px;display:flex;flex-direction:column;align-items:center;position:relative;}
+  .lightbox-name{font-size:12.5px;color:var(--ink-soft);margin:0 30px 10px;text-align:center;word-break:break-word;}
+  .lightbox-body{max-width:100%;display:flex;align-items:center;justify-content:center;overflow:auto;}
+  .lightbox-body img{max-width:min(84vw,900px);max-height:62vh;border-radius:4px;display:block;}
+  .file-preview{display:flex;flex-direction:column;align-items:center;gap:8px;padding:40px 30px;color:var(--ink-soft);text-align:center;}
+  .file-preview .ext{font-size:30px;font-weight:700;color:var(--navy);}
+  .lightbox-actions{margin-top:16px;}
+
+  .panel{background:#fff;border-radius:8px;width:100%;max-width:520px;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;}
+  .panel-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);position:relative;}
+  .panel-header h2{margin:0;font-size:15px;color:var(--navy);}
+  .panel-header p{margin:3px 0 0;font-size:11.5px;color:var(--ink-soft);}
+  .requests-list{overflow-y:auto;padding:8px 12px 16px;}
+  .requests-empty{color:var(--ink-soft);font-size:13px;text-align:center;padding:30px 10px;}
+  .request-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 10px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .request-item.active{background:var(--tint);border-radius:5px;}
+  .request-main{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1 1 200px;}
+  .request-main strong{font-size:13.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .request-meta{font-size:11.5px;color:var(--ink-soft);}
+  .badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10.5px;font-weight:600;}
+  .badge.draft{background:#F0E9D8;color:#7a5f12;}
+  .badge.sent{background:#E4EFE3;color:var(--ok);}
+  .request-actions{display:flex;gap:8px;flex-shrink:0;align-items:center;}
+  .small-btn{background:var(--navy);color:#fff;border:none;border-radius:4px;padding:7px 12px;font-size:12px;cursor:pointer;font-family:inherit;}
+  .small-btn:hover{background:var(--navy-dark);}
+  .small-btn.danger{background:var(--rust);}
+  .small-btn.plain{background:none;color:var(--ink-soft);border:1px solid var(--line);}
+  .delete-btn{background:none;border:none;color:var(--ink-soft);font-size:18px;cursor:pointer;padding:2px 6px;}
+  .delete-btn:hover{color:var(--rust);}
+  .ready-body{padding:18px 20px 22px;}
+  .ready-tip{font-size:13px;line-height:1.55;color:var(--ink);margin:0 0 16px;}
+  .ready-msg{font-size:12px;color:var(--rust);margin:12px 0 0;min-height:1em;}
+  .ready-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .ready-actions button{flex:1 1 180px;}
+
+  .actions-bar{position:sticky;bottom:0;background:var(--paper);border-top:1px solid var(--line);margin-top:20px;padding:14px 20px calc(14px + env(safe-area-inset-bottom,0px));}
+  .actions-inner{max-width:820px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+  .status{font-size:11.5px;color:var(--ink-soft);flex:1 1 200px;min-width:0;}
+  .status.err{color:var(--rust);font-weight:600;}
+  .status.good{color:var(--ok);font-weight:600;}
+  .btn-group{display:flex;gap:10px;flex-wrap:wrap;}
+  button.primary{background:var(--navy);color:#fff;border:none;border-radius:4px;padding:11px 18px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  button.primary:hover{background:var(--navy-dark);}
+  button.secondary{background:#fff;color:var(--navy);border:1px solid var(--navy);border-radius:4px;padding:11px 18px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  button.secondary:hover{background:var(--tint);}
+  button.ghost{background:none;color:var(--ink-soft);border:none;font-size:12px;cursor:pointer;text-decoration:underline;font-family:inherit;padding:8px 4px;}
+  button:disabled{opacity:.6;cursor:progress;}
+  button:focus-visible{outline:2px solid var(--rust);outline-offset:2px;}
+
+  /* Phones: one column, 16px text so iOS doesn't zoom, bigger tap targets */
+  @media(max-width:560px){
+    .topbar{padding:18px 16px;}
+    .wrap{padding:18px 14px 0;}
+    .card{padding:18px 16px 6px;}
+    .row2{grid-template-columns:1fr;}
+    .field input[type=text],.field input[type=number],.field input[type=date],.field input[type=email],.field input[type=tel],.field select,.field textarea,table.qty-table input{font-size:16px;}
+    .check-item{font-size:14px;}
+    .check-item input{width:20px;height:20px;}
+    .check-list .check-item label{font-size:13.5px;}
+    .attach-btn{font-size:14px;padding:10px 14px;}
+    .actions-bar{padding-left:14px;padding-right:14px;}
+    .btn-group{width:100%;}
+    .btn-group button.primary,.btn-group button.secondary{flex:1 1 100%;}
+  }
+  @media(pointer:coarse){.attach-thumb .rm{width:26px;height:26px;font-size:15px;}}
+</style>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div>
+      <h1>Marketing Material &amp; Demo Request</h1>
+      <p>Sales team intake form &mdash; for the marketing team</p>
+    </div>
+    <div class="req-id" id="reqId"></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="reminders">
+    <strong>Before you submit:</strong> confirm the item is actually in stock before promising a delivery date &middot; agree a return date up front for any <strong>loan</strong> item &middot; get cost sign-off before dispatching high-value demo units.
+  </div>
+
+  <form id="requestForm" autocomplete="off" novalidate>
+
+    <div class="card">
+      <h2><span class="num">1.1</span> Client &amp; Request Overview</h2>
+      <p class="sub">Who this is for and why they need it.</p>
+      <div class="row2">
+        <div class="field"><label for="f-companyName">Company name</label><input type="text" id="f-companyName" name="companyName"></div>
+        <div class="field"><label for="f-contactPerson">Contact person</label><input type="text" id="f-contactPerson" name="contactPerson"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="f-phone">Phone number</label><input type="tel" id="f-phone" name="phone"></div>
+        <div class="field"><label for="f-email">Email address</label><input type="email" id="f-email" name="email"></div>
+      </div>
+      <div class="field"><label for="f-address">Physical address</label><input type="text" id="f-address" name="address"></div>
+      <div class="field">
+        <label for="f-purpose">Purpose of request</label>
+        <select id="f-purpose" name="purpose">
+          <option value="">Select...</option>
+          <option>Showcase at customer office</option>
+          <option>Trade show / exhibition</option>
+          <option>Sales demo / presentation</option>
+          <option>Reception / showroom display</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field"><label for="f-timeline">Timeline required <span class="hint">(when does the client need it by?)</span></label><input type="text" id="f-timeline" name="timeline" placeholder="e.g. 2 weeks / specific date"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">1.2</span> Item(s) Requested</h2>
+      <p class="sub">What's being requested, and how much of it.</p>
+      <div class="field">
+        <span class="label">Type of item</span>
+        <div class="check-group">
+          <span class="check-item"><input type="checkbox" id="c-typeDemoMotor" name="typeDemoMotor"><label for="c-typeDemoMotor">Demo motor / product unit</label></span>
+          <span class="check-item"><input type="checkbox" id="c-typeSample" name="typeSample"><label for="c-typeSample">Product sample</label></span>
+          <span class="check-item"><input type="checkbox" id="c-typeDisplayStand" name="typeDisplayStand"><label for="c-typeDisplayStand">Point-of-sale / display stand</label></span>
+          <span class="check-item"><input type="checkbox" id="c-typeBanner" name="typeBanner"><label for="c-typeBanner">Banner / pull-up stand</label></span>
+          <span class="check-item"><input type="checkbox" id="c-typeBrochure" name="typeBrochure"><label for="c-typeBrochure">Brochures / catalogues</label></span>
+          <span class="check-item"><input type="checkbox" id="c-typeMerch" name="typeMerch"><label for="c-typeMerch">Branded merchandise</label></span>
+        </div>
+      </div>
+      <div class="qty-wrap">
+        <table class="qty-table">
+          <thead><tr><th style="width:60%;">Item / product model</th><th>Quantity</th><th></th></tr></thead>
+          <tbody id="qtyBody"></tbody>
+        </table>
+      </div>
+      <button type="button" class="add-row-btn" id="addQtyRow">+ Add another item</button>
+      <div class="row2">
+        <div class="field">
+          <label for="f-loanType">Is this a loan item or permanent?</label>
+          <select id="f-loanType" name="loanType">
+            <option value="">Select...</option>
+            <option>Loan &mdash; must be returned</option>
+            <option>Permanent &mdash; leave with client</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+        <div class="field"><label for="f-returnDate">Expected return date <span class="hint">(if a loan item)</span></label><input type="date" id="f-returnDate" name="returnDate"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">1.3</span> Delivery &amp; Display Location</h2>
+      <p class="sub">Where the item is going, and where it'll be shown.</p>
+      <div class="field"><label for="f-deliveryAddress">Delivery address <span class="hint">(if different from the client address above)</span></label><input type="text" id="f-deliveryAddress" name="deliveryAddress"></div>
+      <div class="field"><label for="f-displayLocation">Where it will be displayed</label><input type="text" id="f-displayLocation" name="displayLocation" placeholder="e.g. reception, showroom, demo counter"></div>
+      <div class="field">
+        <span class="label">Photos of the display location <span class="hint">(optional)</span></span>
+        <div class="attach-zone" data-zone="locationPhotos">
+          <label class="attach-btn" for="fileLocationPhotos" tabindex="0" role="button">&#128247; Attach photos</label>
+          <p class="attach-hint">Take a photo or pick from your gallery &middot; on a laptop you can drag and drop here</p>
+          <input type="file" id="fileLocationPhotos" class="vh" accept="image/*" multiple>
+          <div class="attach-grid" id="gridLocationPhotos"></div>
+        </div>
+      </div>
+      <div class="field"><label for="f-handlingNotes">Special handling / installation notes</label><textarea id="f-handlingNotes" name="handlingNotes" rows="3" placeholder="e.g. needs a plinth, fragile, requires two people to carry, needs a power point nearby"></textarea></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">1.4</span> Approval &amp; Logistics</h2>
+      <p class="sub">Confirm before this goes to the marketing team.</p>
+      <div class="check-list">
+        <span class="check-item"><input type="checkbox" id="c-stockConfirmed" name="stockConfirmed"><label for="c-stockConfirmed">Item availability confirmed with marketing/stock</label></span>
+        <span class="check-item"><input type="checkbox" id="c-costApproved" name="costApproved"><label for="c-costApproved">Cost / budget approved (if applicable)</label></span>
+        <span class="check-item"><input type="checkbox" id="c-clientConfirmed" name="clientConfirmed"><label for="c-clientConfirmed">Client has confirmed they want this item</label></span>
+      </div>
+      <div class="field" style="margin-top:14px;">
+        <span class="label">Cost approval / quote <span class="hint">(photo or PDF, if applicable)</span></span>
+        <div class="attach-zone" data-zone="approvalFiles">
+          <label class="attach-btn" for="fileApprovalFiles" tabindex="0" role="button">&#128206; Attach files</label>
+          <p class="attach-hint">Photos or PDF files &middot; on a laptop you can drag and drop here</p>
+          <input type="file" id="fileApprovalFiles" class="vh" accept="image/*,application/pdf,.pdf" multiple>
+          <div class="attach-grid" id="gridApprovalFiles"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">2</span> Process Checklist</h2>
+      <p class="sub">Sales team tracking &mdash; follow in sequence.</p>
+      <div class="check-list">
+        <span class="check-item"><input type="checkbox" id="c-stepSubmitted" name="stepSubmitted"><label for="c-stepSubmitted">Request submitted to marketing team</label></span>
+        <span class="check-item"><input type="checkbox" id="c-stepAvailability" name="stepAvailability"><label for="c-stepAvailability">Availability and cost confirmed</label></span>
+        <span class="check-item"><input type="checkbox" id="c-stepDispatch" name="stepDispatch"><label for="c-stepDispatch">Dispatch / collection arranged</label></span>
+        <span class="check-item"><input type="checkbox" id="c-stepDelivered" name="stepDelivered"><label for="c-stepDelivered">Delivered / set up at client site</label></span>
+        <span class="check-item"><input type="checkbox" id="c-stepConfirm" name="stepConfirm"><label for="c-stepConfirm">Confirmation sent to client</label></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">&#9998;</span> Notes for the Marketing Team</h2>
+      <p class="sub">Anything else marketing should know.</p>
+      <div class="field">
+        <span class="label">Reference images / spec sheets <span class="hint">(optional, photos or PDF)</span></span>
+        <div class="attach-zone" data-zone="referenceFiles">
+          <label class="attach-btn" for="fileReferenceFiles" tabindex="0" role="button">&#128206; Attach files</label>
+          <p class="attach-hint">Photos or PDF files &middot; on a laptop you can drag and drop here</p>
+          <input type="file" id="fileReferenceFiles" class="vh" accept="image/*,application/pdf,.pdf" multiple>
+          <div class="attach-grid" id="gridReferenceFiles"></div>
+        </div>
+      </div>
+      <div class="field"><label for="f-notes" class="vh">Notes</label><textarea id="f-notes" name="notes" rows="4" placeholder="Additional context, special requests, site access notes, etc."></textarea></div>
+      <div class="row2">
+        <div class="field"><label for="f-salesRep">Sales rep name</label><input type="text" id="f-salesRep" name="salesRep"></div>
+        <div class="field"><label for="f-requestDate">Date</label><input type="date" id="f-requestDate" name="requestDate"></div>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<div class="actions-bar">
+  <div class="actions-inner">
+    <span class="status" id="statusMsg" role="status" aria-live="polite">Draft saves automatically on this device</span>
+    <div class="btn-group">
+      <button type="button" class="ghost" id="requestsBtn">My saved requests</button>
+      <button type="button" class="ghost" id="newBtn">Start new request</button>
+      <button type="button" class="secondary" id="pdfBtn">Save as PDF</button>
+      <button type="button" class="primary" id="packBtn">Download full pack for marketing</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="requestsOverlay">
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="reqTitle">
+    <div class="panel-header">
+      <div>
+        <h2 id="reqTitle">Saved Requests</h2>
+        <p>Saved on this device only.</p>
+      </div>
+      <button type="button" class="close-x" id="requestsClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="requests-list" id="requestsList"></div>
+  </div>
+</div>
+
+<div class="overlay" id="lightboxOverlay">
+  <div class="lightbox-inner" role="dialog" aria-modal="true" aria-labelledby="lightboxName">
+    <button type="button" class="close-x" id="lightboxClose" aria-label="Close">&times;</button>
+    <p class="lightbox-name" id="lightboxName"></p>
+    <div class="lightbox-body" id="lightboxBody"></div>
+    <div class="lightbox-actions"><button type="button" class="secondary" id="lightboxSave">Save a copy</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="readyOverlay">
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="readyTitle">
+    <div class="panel-header">
+      <div>
+        <h2 id="readyTitle">Your file is ready</h2>
+        <p id="readyName"></p>
+      </div>
+      <button type="button" class="close-x" id="readyClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="ready-body">
+      <p class="ready-tip" id="readyTip"></p>
+      <div class="ready-actions">
+        <button type="button" class="primary" id="readyShare">Save or share</button>
+        <button type="button" class="secondary" id="readyOpen">Open file</button>
+      </div>
+      <p class="ready-msg" id="readyMsg" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* ================= Where the form is running ================= */
+const inViewer = !!(window.claude && typeof window.claude.use === 'function');
+const downloadsP = inViewer ? window.claude.use('downloads').catch(()=>null) : Promise.resolve(null);
+const UA = navigator.userAgent || '';
+const isIOS = /iPad|iPhone|iPod/.test(UA) || (/Macintosh/.test(UA) && navigator.maxTouchPoints > 1); // iPadOS reports as Mac
+const isAndroid = /Android/i.test(UA);
+const isMobile = isIOS || isAndroid;
+
+/* ================= Device storage: IndexedDB (room for photos), then localStorage, then memory ================= */
+const Store = (()=>{
+  const mem = new Map();
+  let dbp = null;
+  function openDb(){
+    if(dbp) return dbp;
+    dbp = new Promise(res=>{
+      try{
+        const r = indexedDB.open('demo-requests', 1);
+        r.onupgradeneeded = ()=> r.result.createObjectStore('kv');
+        r.onsuccess = ()=> res(r.result);
+        r.onerror = ()=> res(null);
+        r.onblocked = ()=> res(null);
+        setTimeout(()=>res(null), 4000);
+      }catch(e){ res(null); }
+    });
+    return dbp;
+  }
+  async function get(k){
+    const db = await openDb();
+    if(db){
+      try{
+        const v = await new Promise((res,rej)=>{ const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); });
+        if(v !== undefined) return v;
+      }catch(e){}
+    }
+    try{ const s = localStorage.getItem(k); if(s != null){ try{ return JSON.parse(s); }catch(e){ return s; } } }catch(e){}
+    return mem.get(k);
+  }
+  async function set(k, v){
+    mem.set(k, v);
+    const db = await openDb();
+    if(db){
+      try{
+        await new Promise((res,rej)=>{ const tx = db.transaction('kv','readwrite'); tx.objectStore('kv').put(v, k); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); tx.onabort=()=>rej(tx.error); });
+        return true;
+      }catch(e){}
+    }
+    try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){}
+    return false;
+  }
+  async function del(k){
+    mem.delete(k);
+    const db = await openDb();
+    if(db){ try{ await new Promise(res=>{ const tx = db.transaction('kv','readwrite'); tx.objectStore('kv').delete(k); tx.oncomplete=res; tx.onerror=res; tx.onabort=res; }); }catch(e){} }
+    try{ localStorage.removeItem(k); }catch(e){}
+  }
+  return {get, set, del};
+})();
+try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(()=>{}); }catch(e){}
+
+const INDEX_KEY = 'demo-requests-index';
+const ACTIVE_KEY = 'demo-active-request-id';
+const dataKey = id => 'demo-request-' + id;
+const attKey = id => 'demo-att-' + id;
+
+/* ================= Elements & state ================= */
+const form = document.getElementById('requestForm');
+const statusMsg = document.getElementById('statusMsg');
+const reqIdEl = document.getElementById('reqId');
+const qtyBody = document.getElementById('qtyBody');
+
+const ZONES = ['locationPhotos','approvalFiles','referenceFiles'];
+const ZONE_LABEL = { locationPhotos:'Display location photos', approvalFiles:'Cost approval / quote', referenceFiles:'Reference images / spec sheets' };
+let attachments = emptyAttachments();
+let attDirty = false;
+let requestId = null;
+let loading = false;
+
+function emptyAttachments(){ const o = {}; ZONES.forEach(z=> o[z] = []); return o; }
+function newId(){ return 'DR-' + Date.now().toString(36).toUpperCase(); }
+function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function today(){ const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function cap(z){ return z.charAt(0).toUpperCase() + z.slice(1); }
+function extOf(name){ const m = /\.([a-z0-9]{1,6})$/i.exec(name || ''); return m ? m[1].toUpperCase() : 'FILE'; }
+function isImageItem(it){ return !!(it.type && it.type.startsWith('image/')); }
+function isPdfItem(it){ return it.type === 'application/pdf' || /\.pdf$/i.test(it.name || ''); }
+
+const STATUS_IDLE = 'Draft saves automatically on this device';
+let statusTimer = null;
+function setStatus(msg, kind){
+  statusMsg.textContent = msg;
+  statusMsg.className = 'status' + (kind ? ' ' + kind : '');
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(()=>{ statusMsg.textContent = STATUS_IDLE; statusMsg.className = 'status'; }, kind === 'err' ? 8000 : 4000);
+}
+
+/* ================= Attachments ================= */
+function readAsDataUrl(file){
+  return new Promise((res,rej)=>{ const r = new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(file); });
+}
+function loadImage(src){
+  return new Promise((res,rej)=>{ const img = new Image(); img.onload=()=>res(img); img.onerror=rej; img.src = src; });
+}
+// Phone photos are 3-8 MB each. Shrink to 1600px JPEG so the phone can store many and the pack stays emailable.
+async function shrinkPhoto(dataUrl){
+  try{
+    const img = await loadImage(dataUrl);
+    const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(img.naturalWidth * scale));
+    c.height = Math.max(1, Math.round(img.naturalHeight * scale));
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,c.width,c.height);
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    const out = c.toDataURL('image/jpeg', 0.82);
+    return out.length < dataUrl.length ? out : dataUrl;
+  }catch(e){ return null; } // browser can't read this image (e.g. HEIC on a PC)
+}
+
+async function handleFiles(zone, fileList){
+  const files = Array.from(fileList || []);
+  if(!files.length) return;
+  setStatus('Adding ' + files.length + ' file' + (files.length > 1 ? 's' : '') + '…');
+  let added = 0, skipped = [];
+  for(const file of files){
+    try{
+      let dataUrl = await readAsDataUrl(file);
+      let type = file.type || (/\.pdf$/i.test(file.name) ? 'application/pdf' : '');
+      let name = file.name || ('file-' + (added + 1));
+      if(type.startsWith('image/') && type !== 'image/svg+xml'){
+        const shrunk = await shrinkPhoto(dataUrl);
+        if(shrunk === null){ skipped.push(name); continue; }
+        if(shrunk !== dataUrl){ dataUrl = shrunk; type = 'image/jpeg'; name = name.replace(/\.[^.]+$/,'') + '.jpg'; }
+      }
+      attachments[zone].push({ name, type, dataUrl });
+      added++;
+    }catch(e){ skipped.push(file.name || 'file'); }
+  }
+  attDirty = true;
+  renderZone(zone);
+  await saveNow();
+  if(skipped.length) setStatus('Couldn’t add ' + skipped.join(', ') + '. Save it as a JPG or PDF and try again.', 'err');
+  else setStatus(added === 1 ? 'File added' : added + ' files added', 'good');
+}
+
+function renderZone(zone){
+  const grid = document.getElementById('grid' + cap(zone));
+  if(!grid) return;
+  grid.innerHTML = '';
+  attachments[zone].forEach((item, idx)=>{
+    const thumb = document.createElement('div');
+    const isImage = isImageItem(item);
+    thumb.className = 'attach-thumb' + (isImage ? '' : ' file');
+    thumb.tabIndex = 0;
+    thumb.setAttribute('role','button');
+    thumb.title = item.name;
+    if(isImage){
+      const img = document.createElement('img'); img.src = item.dataUrl; img.alt = item.name; thumb.appendChild(img);
+    } else {
+      const ext = document.createElement('span'); ext.className = 'ext'; ext.textContent = '.' + extOf(item.name);
+      const fn = document.createElement('span'); fn.className = 'fname'; fn.textContent = item.name;
+      thumb.append(ext, fn);
+    }
+    thumb.addEventListener('click', ()=> openLightbox(item));
+    thumb.addEventListener('keydown', e=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openLightbox(item); } });
+    const rm = document.createElement('button');
+    rm.className = 'rm'; rm.type = 'button'; rm.innerHTML = '&times;'; rm.setAttribute('aria-label', 'Remove ' + item.name);
+    rm.onclick = (e)=>{ e.stopPropagation(); attachments[zone].splice(idx, 1); attDirty = true; renderZone(zone); scheduleSave(); };
+    thumb.appendChild(rm);
+    grid.appendChild(thumb);
+  });
+}
+
+function wireZone(zone){
+  const input = document.getElementById('file' + cap(zone));
+  const dropzone = document.querySelector('.attach-zone[data-zone="' + zone + '"]');
+  const btn = dropzone.querySelector('.attach-btn');
+  // The button is a <label> tied to the file input: that opens the picker on iPhone, iPad, Android and PCs alike.
+  btn.addEventListener('keydown', e=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); input.click(); } });
+  input.addEventListener('change', ()=>{ const fl = Array.from(input.files || []); input.value = ''; handleFiles(zone, fl); });
+  let depth = 0;
+  dropzone.addEventListener('dragenter', e=>{ e.preventDefault(); depth++; dropzone.classList.add('dragover'); });
+  dropzone.addEventListener('dragover', e=>{ e.preventDefault(); if(e.dataTransfer) e.dataTransfer.dropEffect = 'copy'; });
+  dropzone.addEventListener('dragleave', e=>{ e.preventDefault(); depth--; if(depth <= 0){ depth = 0; dropzone.classList.remove('dragover'); } });
+  dropzone.addEventListener('drop', e=>{ e.preventDefault(); depth = 0; dropzone.classList.remove('dragover'); if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) handleFiles(zone, e.dataTransfer.files); });
+}
+ZONES.forEach(wireZone);
+window.addEventListener('dragover', e=> e.preventDefault());
+window.addEventListener('drop', e=> e.preventDefault());
+
+/* ================= Lightbox (preview inside the form) ================= */
+const lightboxOverlay = document.getElementById('lightboxOverlay');
+const lightboxBody = document.getElementById('lightboxBody');
+const lightboxName = document.getElementById('lightboxName');
+let lightboxItem = null;
+function openLightbox(item){
+  lightboxItem = item;
+  lightboxBody.innerHTML = '';
+  if(isImageItem(item)){ const img = document.createElement('img'); img.src = item.dataUrl; img.alt = item.name; lightboxBody.appendChild(img); }
+  else { lightboxBody.innerHTML = '<div class="file-preview"><span class="ext">.' + esc(extOf(item.name)) + '</span><span>No preview for this file type. It goes to marketing in the full pack.</span></div>'; }
+  lightboxName.textContent = item.name;
+  lightboxOverlay.classList.add('show');
+}
+function closeLightbox(){ lightboxOverlay.classList.remove('show'); lightboxBody.innerHTML = ''; lightboxItem = null; }
+document.getElementById('lightboxClose').onclick = closeLightbox;
+lightboxOverlay.addEventListener('click', e=>{ if(e.target === lightboxOverlay) closeLightbox(); });
+document.getElementById('lightboxSave').onclick = async ()=>{
+  if(!lightboxItem) return;
+  const r = await deliver(lightboxItem.name, dataUrlToBlob(lightboxItem.dataUrl));
+  if(!r.ok) setStatus(r.msg, 'err');
+};
+
+/* ================= Item rows ================= */
+function addRow(type, qty){
+  const tr = document.createElement('tr');
+  const n = Math.random().toString(36).slice(2,8);
+  tr.innerHTML =
+    '<td><input type="text" class="qty-type" id="qt-' + n + '" aria-label="Item / product model" placeholder="e.g. Centurion D5-Evo demo motor, branded pull-up banner"></td>' +
+    '<td><input type="number" inputmode="numeric" class="qty-count" id="qc-' + n + '" aria-label="Quantity" min="0" style="width:80px;"></td>' +
+    '<td><button type="button" class="rm-row" aria-label="Remove row">&times;</button></td>';
+  tr.querySelector('.qty-type').value = type || '';
+  tr.querySelector('.qty-count').value = qty || '';
+  tr.querySelector('.rm-row').onclick = ()=>{ tr.remove(); if(!qtyBody.children.length) addRow(); scheduleSave(); };
+  qtyBody.appendChild(tr);
+}
+function collectQtyRows(){
+  const rows = [];
+  qtyBody.querySelectorAll('tr').forEach(tr=>{
+    const type = tr.querySelector('.qty-type').value.trim();
+    const qty = tr.querySelector('.qty-count').value;
+    if(type || qty) rows.push({type, qty});
+  });
+  return rows;
+}
+document.getElementById('addQtyRow').onclick = ()=>{ addRow(); qtyBody.lastElementChild.querySelector('.qty-type').focus(); };
+
+/* ================= Gather / fill the form ================= */
+function gatherFormData(){
+  const data = {};
+  form.querySelectorAll('input[name], select[name], textarea[name]').forEach(el=>{
+    data[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+  });
+  data.itemRows = collectQtyRows();
+  data.attachments = attachments;
+  return data;
+}
+function resetFormShell(){
+  form.reset();
+  qtyBody.innerHTML = '';
+  attachments = emptyAttachments();
+  attDirty = false;
+  ZONES.forEach(renderZone);
+}
+function populateForm(data){
+  form.querySelectorAll('input[name], select[name], textarea[name]').forEach(el=>{
+    if(!(el.name in data)) return;
+    if(el.type === 'checkbox') el.checked = !!data[el.name];
+    else el.value = data[el.name] == null ? '' : data[el.name];
+  });
+  qtyBody.innerHTML = '';
+  (data.itemRows || data.signageRows || []).forEach(r=> addRow(r.type, r.qty));
+  if(data.attachments){ ZONES.forEach(z=>{ attachments[z] = Array.isArray(data.attachments[z]) ? data.attachments[z] : []; renderZone(z); }); }
+}
+
+/* ================= Saving drafts ================= */
+function hasContent(d){
+  if(d.companyName || d.contactPerson || d.salesRep || d.notes || d.address || d.phone || d.email) return true;
+  if(d.itemRows && d.itemRows.length) return true;
+  return ZONES.some(z=> d.attachments && d.attachments[z] && d.attachments[z].length);
+}
+async function getIndex(){ const v = await Store.get(INDEX_KEY); return Array.isArray(v) ? v : []; }
+async function setIndex(v){ await Store.set(INDEX_KEY, v); }
+
+let saveTimer = null;
+function scheduleSave(){ if(loading) return; clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 400); }
+async function saveNow(){
+  clearTimeout(saveTimer);
+  if(loading || !requestId) return;
+  const data = gatherFormData();
+  const fields = Object.assign({}, data); delete fields.attachments;
+  let ok = await Store.set(dataKey(requestId), fields);
+  if(attDirty){ // photos are only re-saved when they change, so typing stays quick on phones
+    attDirty = false;
+    if(!(await Store.set(attKey(requestId), attachments))){ ok = false; attDirty = true; }
+  }
+  if(!ok) setStatus('This device couldn’t save the draft. Download the full pack before closing.', 'err');
+  Store.set(ACTIVE_KEY, requestId);
+  if(data.salesRep) Store.set('demo-rep-name', data.salesRep);
+  if(hasContent(data)){
+    const idx = await getIndex();
+    const pos = idx.findIndex(r=> r.id === requestId);
+    const entry = { id:requestId, company:data.companyName || '', salesRep:data.salesRep || '', status: pos >= 0 ? idx[pos].status : 'draft', lastEdited: Date.now() };
+    if(pos >= 0) idx[pos] = entry; else idx.push(entry);
+    await setIndex(idx);
+  }
+}
+form.addEventListener('input', scheduleSave);
+form.addEventListener('change', scheduleSave);
+form.addEventListener('submit', e=> e.preventDefault()); // "Go" on a phone keyboard must not reload the page
+window.addEventListener('pagehide', ()=>{ saveNow(); });
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState === 'hidden') saveNow(); });
+
+async function markSent(){
+  const idx = await getIndex();
+  const pos = idx.findIndex(r=> r.id === requestId);
+  if(pos >= 0){ idx[pos].status = 'sent'; idx[pos].lastEdited = Date.now(); await setIndex(idx); }
+}
+
+async function loadRequest(id){
+  loading = true;
+  requestId = id;
+  reqIdEl.textContent = 'Request ID: ' + id;
+  resetFormShell();
+  let data = null, att = null;
+  try{ data = await Store.get(dataKey(id)); }catch(e){}
+  try{ att = await Store.get(attKey(id)); }catch(e){}
+  if(data && typeof data === 'object' || att){
+    data = (data && typeof data === 'object') ? data : {};
+    if(att) data.attachments = att;
+    else if(data.attachments) attDirty = true; // older draft: move its files to the new layout
+    populateForm(data);
+  }
+  if(!qtyBody.children.length) addRow();
+  if(!form.elements.requestDate.value) form.elements.requestDate.value = today();
+  if(!form.elements.salesRep.value){ const rep = await Store.get('demo-rep-name'); if(typeof rep === 'string' && rep) form.elements.salesRep.value = rep; }
+  loading = false;
+  Store.set(ACTIVE_KEY, id);
+}
+
+async function startNew(){
+  await saveNow();
+  await loadRequest(newId());
+  window.scrollTo({top:0, behavior:'smooth'});
+  setStatus('New request started', 'good');
+}
+document.getElementById('newBtn').onclick = startNew;
+
+/* ================= Saved requests panel ================= */
+const requestsOverlay = document.getElementById('requestsOverlay');
+const requestsList = document.getElementById('requestsList');
+function timeAgo(ts){
+  const mins = Math.round((Date.now() - ts) / 60000);
+  if(mins < 1) return 'just now';
+  if(mins < 60) return mins + 'm ago';
+  const hrs = Math.round(mins / 60);
+  if(hrs < 24) return hrs + 'h ago';
+  return Math.round(hrs / 24) + 'd ago';
+}
+async function renderRequestsList(){
+  const idx = (await getIndex()).sort((a,b)=> b.lastEdited - a.lastEdited);
+  requestsList.innerHTML = '';
+  if(!idx.length){ requestsList.innerHTML = '<p class="requests-empty">No saved requests yet. Fill in a company name to start one.</p>'; return; }
+  idx.forEach(entry=>{
+    const item = document.createElement('div');
+    item.className = 'request-item' + (entry.id === requestId ? ' active' : '');
+    const sent = entry.status === 'sent';
+    item.innerHTML =
+      '<div class="request-main"><strong>' + (entry.company ? esc(entry.company) : 'Untitled request') + '</strong>' +
+      '<span class="request-meta">' + (entry.salesRep ? esc(entry.salesRep) : '—') + ' &middot; <span class="badge ' + (sent ? 'sent' : 'draft') + '">' + (sent ? 'Sent to marketing' : 'Draft') + '</span> &middot; edited ' + timeAgo(entry.lastEdited) + '</span></div>' +
+      '<div class="request-actions"><button type="button" class="small-btn open-btn">Open</button><button type="button" class="delete-btn" aria-label="Delete">&times;</button></div>';
+    const actions = item.querySelector('.request-actions');
+    item.querySelector('.open-btn').onclick = async ()=>{ await saveNow(); await loadRequest(entry.id); closeRequestsPanel(); window.scrollTo({top:0}); };
+    item.querySelector('.delete-btn').onclick = ()=>{
+      actions.innerHTML = '<span class="request-meta">Delete?</span><button type="button" class="small-btn danger">Delete</button><button type="button" class="small-btn plain">Keep</button>';
+      actions.querySelector('.danger').onclick = async ()=>{
+        await setIndex((await getIndex()).filter(r=> r.id !== entry.id));
+        await Store.del(dataKey(entry.id));
+        await Store.del(attKey(entry.id));
+        if(entry.id === requestId) await loadRequest(newId());
+        renderRequestsList();
+      };
+      actions.querySelector('.plain').onclick = renderRequestsList;
+    };
+    requestsList.appendChild(item);
+  });
+}
+async function openRequestsPanel(){ await saveNow(); await renderRequestsList(); requestsOverlay.classList.add('show'); }
+function closeRequestsPanel(){ requestsOverlay.classList.remove('show'); }
+document.getElementById('requestsBtn').onclick = openRequestsPanel;
+document.getElementById('requestsClose').onclick = closeRequestsPanel;
+requestsOverlay.addEventListener('click', e=>{ if(e.target === requestsOverlay) closeRequestsPanel(); });
+
+/* ================= Saving files: PC, Mac, iPhone, iPad, Android and the Claude viewer ================= */
+function dataUrlToBytes(dataUrl){
+  const comma = dataUrl.indexOf(',');
+  const meta = dataUrl.slice(0, comma);
+  const body = dataUrl.slice(comma + 1);
+  if(/;base64/i.test(meta)){
+    const bin = atob(body);
+    const bytes = new Uint8Array(bin.length);
+    for(let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+  return new TextEncoder().encode(decodeURIComponent(body));
+}
+function dataUrlToBlob(dataUrl){ const m = /^data:([^;,]+)/.exec(dataUrl); return new Blob([dataUrlToBytes(dataUrl)], {type: (m && m[1]) || 'application/octet-stream'}); }
+function makeFile(filename, blob){ try{ return new File([blob], filename, {type: blob.type || 'application/octet-stream'}); }catch(e){ return null; } }
+function canShareFile(file){ try{ return !!(file && navigator.share && navigator.canShare && navigator.canShare({files:[file]})); }catch(e){ return false; } }
+function anchorDownload(filename, blob){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.rel = 'noopener'; a.style.display = 'none';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=> URL.revokeObjectURL(url), 120000);
+}
+function fmtSize(n){ return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+
+// Phones only allow the share sheet or a file save straight after a tap. Building the file takes a
+// moment, so we build it first and then ask for one more tap on "Save or share".
+const readyOverlay = document.getElementById('readyOverlay');
+const readyName = document.getElementById('readyName');
+const readyTip = document.getElementById('readyTip');
+const readyMsg = document.getElementById('readyMsg');
+const readyShare = document.getElementById('readyShare');
+const readyOpen = document.getElementById('readyOpen');
+let readyFile = null;
+const BLOCKED = 'This browser blocked saving. Open the form in Safari or Chrome (not inside WhatsApp, Outlook or Teams) and try again.';
+
+function showReady(filename, blob, onSaved){
+  readyFile = {filename, blob, onSaved};
+  readyName.textContent = filename + ' · ' + fmtSize(blob.size);
+  readyTip.textContent = isIOS
+    ? 'Tap Save or share, then choose Mail or Outlook to send it to marketing, or Save to Files to keep a copy.'
+    : isAndroid
+      ? 'Tap Save or share, then choose Gmail, Outlook or WhatsApp to send it to marketing, or Download to keep a copy.'
+      : 'Click Save or share to download the file.';
+  readyMsg.textContent = '';
+  readyOverlay.classList.add('show');
+}
+function closeReady(){ readyOverlay.classList.remove('show'); readyFile = null; }
+async function readyDone(){ const f = readyFile; closeReady(); if(f && f.onSaved) await f.onSaved(); }
+readyShare.onclick = ()=>{
+  if(!readyFile) return;
+  const {filename, blob} = readyFile;
+  const file = makeFile(filename, blob);
+  if(canShareFile(file)){
+    navigator.share({files:[file]}).then(readyDone).catch(err=>{
+      if(err && err.name === 'AbortError'){ readyMsg.textContent = 'Not sent yet. Tap Save or share when you’re ready.'; return; }
+      try{ anchorDownload(filename, blob); readyDone(); }catch(e){ readyMsg.textContent = BLOCKED; }
+    });
+    return;
+  }
+  try{ anchorDownload(filename, blob); readyDone(); }catch(e){ readyMsg.textContent = BLOCKED; }
+};
+readyOpen.onclick = ()=>{
+  if(!readyFile) return;
+  const url = URL.createObjectURL(readyFile.blob);
+  const w = window.open(url, '_blank');
+  if(!w){ URL.revokeObjectURL(url); readyMsg.textContent = 'Your browser blocked the new tab. Use Save or share instead.'; return; }
+  setTimeout(()=> URL.revokeObjectURL(url), 300000);
+  if(isMobile) readyMsg.textContent = 'In the new tab, tap the Share icon to save or send the file.';
+};
+document.getElementById('readyClose').onclick = closeReady;
+readyOverlay.addEventListener('click', e=>{ if(e.target === readyOverlay) closeReady(); });
+
+async function deliver(filename, blob, onSaved){
+  const dl = await downloadsP;
+  if(dl){ // running inside the Claude viewer: it shows its own save prompt / share sheet
+    try{ await dl.save({filename, data: blob}); return {ok:true}; }
+    catch(e){
+      const code = e && e.code;
+      if(code === 'declined') return {ok:false, msg:'Download cancelled. Your form is still here.'};
+      if(code === 'rate_limited') return {ok:false, msg:'A download is already waiting for you to confirm.'};
+      if(code === 'too_large') return {ok:false, msg:'The file is too large. Remove a few photos and try again.'};
+      if(code === 'rejected_extension' || code === 'extension_not_enabled') return {ok:false, msg:'This app can’t save this file type. Open the form in Safari or Chrome instead.'};
+      return {ok:false, msg:'Saving isn’t available here. Open the form in Safari or Chrome and try again.'};
+    }
+  }
+  if(inViewer) return {ok:false, msg:'Saving isn’t available here. Open the form in Safari or Chrome and try again.'};
+  if(isMobile){ showReady(filename, blob, onSaved); return {ok:true, pending:true}; }
+  try{ anchorDownload(filename, blob); return {ok:true}; }
+  catch(e){ showReady(filename, blob, onSaved); return {ok:true, pending:true}; }
+}
+
+/* ================= What goes in the PDF and the full pack ================= */
+function yn(v){ return v ? 'Yes' : 'No'; }
+function safeName(d){ return (d.companyName || 'request').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').toLowerCase() || 'request'; }
+function itemTypes(d){
+  return [
+    d.typeDemoMotor && 'Demo motor / product unit',
+    d.typeSample && 'Product sample',
+    d.typeDisplayStand && 'Point-of-sale / display stand',
+    d.typeBanner && 'Banner / pull-up stand',
+    d.typeBrochure && 'Brochures / catalogues',
+    d.typeMerch && 'Branded merchandise'
+  ].filter(Boolean).join(', ') || '—';
+}
+function sections(d){
+  return [
+    {title:'1.1 Client & Request Overview', rows:[['Company', d.companyName], ['Contact person', d.contactPerson], ['Phone', d.phone], ['Email', d.email], ['Address', d.address], ['Purpose', d.purpose], ['Timeline', d.timeline]]},
+    {title:'1.2 Item(s) Requested', rows:[['Type of item', itemTypes(d)]], items:true, rowsAfter:[['Loan or permanent', d.loanType], ['Expected return date', d.returnDate]]},
+    {title:'1.3 Delivery & Display Location', rows:[['Delivery address', d.deliveryAddress], ['Display location', d.displayLocation], ['Handling notes', d.handlingNotes]]},
+    {title:'1.4 Approval & Logistics', rows:[['Item availability confirmed', yn(d.stockConfirmed)], ['Cost / budget approved', yn(d.costApproved)], ['Client confirmed they want this item', yn(d.clientConfirmed)]]},
+    {title:'Process Checklist', rows:[['Request submitted to marketing team', yn(d.stepSubmitted)], ['Availability and cost confirmed', yn(d.stepAvailability)], ['Dispatch / collection arranged', yn(d.stepDispatch)], ['Delivered / set up at client site', yn(d.stepDelivered)], ['Confirmation sent to client', yn(d.stepConfirm)]]},
+    {title:'Notes for the Marketing Team', text:d.notes}
+  ];
+}
+const REMINDER = 'Reminder: confirm stock availability before promising a delivery date · agree a return date up front for loan items · get cost sign-off before dispatching high-value demo units.';
+
+/* ---------- PDF ("Save as PDF") ---------- */
+async function imageForPdf(pdf, item){
+  try{
+    if(/image\/jpe?g/i.test(item.type)) return await pdf.embedJpg(dataUrlToBytes(item.dataUrl));
+    if(/image\/png/i.test(item.type)) return await pdf.embedPng(dataUrlToBytes(item.dataUrl));
+  }catch(e){}
+  try{
+    const img = await loadImage(item.dataUrl);
+    const w = img.naturalWidth || 1200, h = img.naturalHeight || 900;
+    const scale = Math.min(1, 1600 / Math.max(w, h));
+    const c = document.createElement('canvas');
+    c.width = Math.round(w * scale); c.height = Math.round(h * scale);
+    const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height); ctx.drawImage(img,0,0,c.width,c.height);
+    return await pdf.embedJpg(dataUrlToBytes(c.toDataURL('image/jpeg', 0.85)));
+  }catch(e){ return null; }
+}
+
+async function buildPdf(d){
+  const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
+  const pdf = await PDFDocument.create();
+  pdf.setTitle('Demo Request ' + requestId + (d.companyName ? ' - ' + d.companyName : ''));
+  const font = await pdf.embedFont(StandardFonts.Helvetica);
+  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const W = 595.28, H = 841.89, M = 42;
+  const NAVY = rgb(15/255,76/255,92/255), INK = rgb(38/255,49/255,74/255), SOFT = rgb(91/255,100/255,120/255);
+  const LINE = rgb(226/255,222/255,212/255), RUST = rgb(193/255,68/255,14/255), REM = rgb(252/255,239/255,233/255), WHITE = rgb(1,1,1);
+  let page, y;
+  const ownPages = [];
+  const clean = s => String(s == null ? '' : s).replace(/\r/g,'').replace(/\t/g,' ')
+    .replace(/[^\n\x20-\x7E -ÿ–—‘’“”•…€]/g, '?');
+  function wrap(text, f, size, maxW){
+    const out = [];
+    clean(text).split('\n').forEach(par=>{
+      let line = '';
+      par.split(/ +/).forEach(w=>{
+        while(f.widthOfTextAtSize(w, size) > maxW && w.length > 1){
+          let cut = w.length - 1;
+          while(cut > 1 && f.widthOfTextAtSize(w.slice(0,cut), size) > maxW) cut--;
+          if(line){ out.push(line); line = ''; }
+          out.push(w.slice(0,cut)); w = w.slice(cut);
+        }
+        const test = line ? line + ' ' + w : w;
+        if(f.widthOfTextAtSize(test, size) <= maxW) line = test;
+        else { if(line) out.push(line); line = w; }
+      });
+      out.push(line);
+    });
+    return out.length ? out : [''];
+  }
+  function newPage(){ page = pdf.addPage([W,H]); ownPages.push(page); y = H - M; }
+  function ensure(h){ if(y - h < M + 24) newPage(); }
+  function heading(t){
+    ensure(60);
+    y -= 16;
+    page.drawText(clean(t), {x:M, y, size:12.5, font:bold, color:NAVY});
+    y -= 7;
+    page.drawLine({start:{x:M,y}, end:{x:W-M,y}, thickness:1.4, color:NAVY});
+    y -= 4;
+  }
+  function row(label, value){
+    const lw = 190, vx = M + lw + 12, vw = W - M - vx, lh = 13;
+    const v = (value == null || value === '') ? '—' : String(value);
+    const ll = wrap(label, font, 9.5, lw), vl = wrap(v, font, 10.5, vw);
+    const n = Math.max(ll.length, vl.length);
+    ensure(n * lh + 10);
+    const base = y - 13;
+    ll.forEach((l,i)=> page.drawText(l, {x:M, y:base - i*lh, size:9.5, font, color:SOFT}));
+    vl.forEach((l,i)=> page.drawText(l, {x:vx, y:base - i*lh, size:10.5, font, color:INK}));
+    y = base - (n - 1) * lh - 7;
+    page.drawLine({start:{x:M,y}, end:{x:W-M,y}, thickness:0.5, color:LINE});
+  }
+  function para(text, size, color){
+    wrap(text, font, size || 10.5, W - 2*M).forEach(l=>{ ensure(15); y -= 14; page.drawText(l, {x:M, y, size:size || 10.5, font, color:color || INK}); });
+  }
+
+  const pdfItems = [];
+  ZONES.forEach(z=> (d.attachments[z] || []).forEach(it=>{ if(isPdfItem(it)) pdfItems.push(it); }));
+  const loaded = [];
+  for(const it of pdfItems){
+    try{ loaded.push({name:it.name, doc: await PDFDocument.load(dataUrlToBytes(it.dataUrl), {ignoreEncryption:true})}); }
+    catch(e){ loaded.push({name:it.name, doc:null}); }
+  }
+
+  newPage();
+  page.drawRectangle({x:0, y:H-78, width:W, height:78, color:NAVY});
+  page.drawText('Marketing Material & Demo Request', {x:M, y:H-40, size:18, font:bold, color:WHITE});
+  page.drawText(clean(d.companyName || 'Untitled request'), {x:M, y:H-60, size:11.5, font, color:WHITE});
+  const idText = 'Request ID: ' + requestId;
+  page.drawText(idText, {x:W - M - font.widthOfTextAtSize(idText, 9.5), y:H-40, size:9.5, font, color:WHITE});
+  y = H - 78 - 10;
+  para('Submitted by: ' + (d.salesRep || '—') + '     Date: ' + (d.requestDate || '—'), 10, SOFT);
+  y -= 6;
+
+  sections(d).forEach(s=>{
+    heading(s.title);
+    if(s.text !== undefined){ para(s.text || '—'); return; }
+    s.rows.forEach(r=> row(r[0], r[1]));
+    if(s.items){
+      const rows = d.itemRows || [];
+      if(rows.length) rows.forEach(r=> row(r.type || '(item not named)', r.qty ? 'Qty ' + r.qty : 'Qty not given'));
+      else row('Items', 'None listed');
+    }
+    (s.rowsAfter || []).forEach(r=> row(r[0], r[1]));
+  });
+
+  const other = [];
+  ZONES.forEach(z=> (d.attachments[z] || []).forEach(it=>{ if(!isImageItem(it) && !isPdfItem(it)) other.push(it.name); }));
+  if(loaded.length || other.length){
+    heading('Attached documents');
+    loaded.forEach(p=> row(p.name, p.doc ? 'Added at the end of this PDF (' + p.doc.getPageCount() + ' page' + (p.doc.getPageCount() === 1 ? '' : 's') + ')' : 'Could not be added. It is in the full pack.'));
+    other.forEach(n=> row(n, 'In the full pack'));
+  }
+
+  for(const z of ZONES){
+    const imgs = (d.attachments[z] || []).filter(isImageItem);
+    if(!imgs.length) continue;
+    heading(ZONE_LABEL[z] + ' (' + imgs.length + ')');
+    const gap = 14, colW = (W - 2*M - gap) / 2, boxH = 200;
+    for(let i = 0; i < imgs.length; i += 2){
+      ensure(boxH + 30);
+      const rowTop = y - 8;
+      let rowH = 40;
+      const cells = [];
+      for(let j = 0; j < 2 && i + j < imgs.length; j++){
+        const em = await imageForPdf(pdf, imgs[i+j]);
+        cells.push(em);
+        rowH = Math.max(rowH, em ? Math.min(boxH, em.height * Math.min(colW / em.width, boxH / em.height)) : 80);
+      }
+      cells.forEach((em, j)=>{
+        const x0 = M + j * (colW + gap);
+        if(em){
+          const sc = Math.min(colW / em.width, boxH / em.height);
+          const w = em.width * sc, h = em.height * sc;
+          page.drawImage(em, {x: x0 + (colW - w) / 2, y: rowTop - h, width:w, height:h});
+        } else {
+          page.drawRectangle({x:x0, y:rowTop - rowH, width:colW, height:rowH, borderColor:LINE, borderWidth:1});
+          page.drawText('Preview not available', {x:x0 + 10, y:rowTop - rowH / 2, size:9, font, color:SOFT});
+        }
+        page.drawText(wrap(imgs[i+j].name, font, 8.5, colW)[0], {x:x0, y:rowTop - rowH - 12, size:8.5, font, color:SOFT});
+      });
+      y = rowTop - rowH - 22;
+    }
+  }
+
+  ensure(56);
+  y -= 14;
+  const rem = wrap(REMINDER, font, 9.5, W - 2*M - 24);
+  const bh = rem.length * 13 + 16;
+  page.drawRectangle({x:M, y:y - bh, width:W - 2*M, height:bh, color:REM});
+  page.drawRectangle({x:M, y:y - bh, width:3.5, height:bh, color:RUST});
+  rem.forEach((l,i)=> page.drawText(l, {x:M + 14, y:y - 17 - i*13, size:9.5, font, color:INK}));
+
+  ownPages.forEach((p,i)=> p.drawText('Demo request ' + requestId + '  •  page ' + (i+1) + ' of ' + ownPages.length, {x:M, y:22, size:8, font, color:SOFT}));
+
+  for(const p of loaded){
+    if(!p.doc) continue;
+    try{ (await pdf.copyPages(p.doc, p.doc.getPageIndices())).forEach(pg=> pdf.addPage(pg)); }catch(e){}
+  }
+  return new Blob([await pdf.save()], {type:'application/pdf'});
+}
+
+/* ---------- Full pack: one HTML report with every photo and file inside ---------- */
+// This function never runs in the form. Its source is copied into the report, where it makes
+// each photo open large, and each photo and file download with one click.
+function reportRuntime(){
+  document.documentElement.className += ' js';
+  var nojs = document.getElementById('nojs'); if(nojs) nojs.parentNode.removeChild(nojs);
+  function toBlob(dataUrl){
+    var c = dataUrl.indexOf(','), meta = dataUrl.slice(5, c), body = dataUrl.slice(c + 1);
+    var type = meta.split(';')[0] || 'application/octet-stream', bytes, i;
+    if(/;base64/i.test(meta)){ var bin = atob(body); bytes = new Uint8Array(bin.length); for(i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); }
+    else { bytes = new TextEncoder().encode(decodeURIComponent(body)); }
+    return new Blob([bytes], {type: type});
+  }
+  function save(blob, name){
+    if(window.navigator && window.navigator.msSaveOrOpenBlob){ window.navigator.msSaveOrOpenBlob(blob, name); return; }
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = name; a.style.display = 'none';
+    document.body.appendChild(a); a.click(); a.parentNode.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+  }
+  var files = [];
+  var cards = document.querySelectorAll('.att');
+  Array.prototype.forEach.call(cards, function(card){
+    var kind = card.getAttribute('data-kind'), name = card.getAttribute('data-name'), folder = card.getAttribute('data-folder');
+    var src = kind === 'image' ? card.querySelector('img').getAttribute('src') : card.querySelector('a.dl').getAttribute('href');
+    var blob = null;
+    function getBlob(){ if(!blob) blob = toBlob(src); return blob; }
+    files.push({name: name, folder: folder, getBlob: getBlob});
+    Array.prototype.forEach.call(card.querySelectorAll('.js-dl, a.dl'), function(b){
+      b.addEventListener('click', function(e){ e.preventDefault(); save(getBlob(), name); });
+    });
+    Array.prototype.forEach.call(card.querySelectorAll('.js-view'), function(b){
+      b.addEventListener('click', function(e){ e.preventDefault(); openLb(src, name, function(){ save(getBlob(), name); }); });
+    });
+    Array.prototype.forEach.call(card.querySelectorAll('.js-open'), function(b){
+      b.addEventListener('click', function(e){
+        e.preventDefault();
+        var url = URL.createObjectURL(getBlob());
+        var w = window.open(url, '_blank');
+        if(!w) save(getBlob(), name);
+      });
+    });
+  });
+
+  var ov = document.getElementById('lbOverlay'), lbImg = document.getElementById('lbImg'), lbName = document.getElementById('lbName'), lbDl = document.getElementById('lbDl'), lbSave = null;
+  function openLb(src, name, onSave){ lbImg.src = src; lbImg.alt = name; lbName.textContent = name; lbSave = onSave; ov.className = 'lb show'; }
+  function closeLb(){ ov.className = 'lb'; lbImg.removeAttribute('src'); }
+  document.getElementById('lbClose').onclick = closeLb;
+  lbDl.onclick = function(e){ e.preventDefault(); if(lbSave) lbSave(); };
+  ov.addEventListener('click', function(e){ if(e.target === ov) closeLb(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLb(); });
+
+  var all = document.getElementById('dlAll');
+  if(all) all.addEventListener('click', function(e){
+    e.preventDefault();
+    var used = {}, entries = [];
+    files.forEach(function(f){
+      var dot = f.name.lastIndexOf('.');
+      var base = dot > 0 ? f.name.slice(0, dot) : f.name, ext = dot > 0 ? f.name.slice(dot) : '';
+      var n = f.folder + '/' + f.name, i = 2;
+      while(used[n.toLowerCase()]){ n = f.folder + '/' + base + ' (' + i + ')' + ext; i++; }
+      used[n.toLowerCase()] = true;
+      entries.push({name: n, blob: f.getBlob()});
+    });
+    Promise.all(entries.map(function(en){ return en.blob.arrayBuffer().then(function(b){ return {name: en.name, bytes: new Uint8Array(b)}; }); }))
+      .then(function(list){ save(makeZip(list), all.getAttribute('data-zip')); });
+  });
+
+  // Small zip writer (files stored as-is; photos and PDFs are already compressed)
+  function makeZip(entries){
+    var table = [], n, k, c;
+    for(n = 0; n < 256; n++){ c = n; for(k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; table[n] = c >>> 0; }
+    function crc32(b){ var x = 0xFFFFFFFF; for(var i = 0; i < b.length; i++) x = table[(x ^ b[i]) & 255] ^ (x >>> 8); return (x ^ 0xFFFFFFFF) >>> 0; }
+    var enc = new TextEncoder(), parts = [], central = [], offset = 0;
+    entries.forEach(function(e){
+      var nameB = enc.encode(e.name), crc = crc32(e.bytes), size = e.bytes.length;
+      var h = new DataView(new ArrayBuffer(30));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, 0, true);
+      h.setUint16(10, 0, true); h.setUint16(12, 0x21, true); h.setUint32(14, crc, true); h.setUint32(18, size, true);
+      h.setUint32(22, size, true); h.setUint16(26, nameB.length, true); h.setUint16(28, 0, true);
+      parts.push(new Uint8Array(h.buffer), nameB, e.bytes);
+      var cd = new DataView(new ArrayBuffer(46));
+      cd.setUint32(0, 0x02014b50, true); cd.setUint16(4, 20, true); cd.setUint16(6, 20, true); cd.setUint16(8, 0x0800, true);
+      cd.setUint16(10, 0, true); cd.setUint16(12, 0, true); cd.setUint16(14, 0x21, true); cd.setUint32(16, crc, true);
+      cd.setUint32(20, size, true); cd.setUint32(24, size, true); cd.setUint16(28, nameB.length, true);
+      cd.setUint32(42, offset, true);
+      central.push(new Uint8Array(cd.buffer), nameB);
+      offset += 30 + nameB.length + size;
+    });
+    var cdSize = 0; central.forEach(function(p){ cdSize += p.length; });
+    var end = new DataView(new ArrayBuffer(22));
+    end.setUint32(0, 0x06054b50, true); end.setUint16(8, entries.length, true); end.setUint16(10, entries.length, true);
+    end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
+    return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), {type: 'application/zip'});
+  }
+}
+
+function buildPackHTML(d){
+  const table = rows => '<table>' + rows.map(r=> '<tr><td class="label">' + esc(r[0]) + '</td><td>' + (esc(r[1]) || '—') + '</td></tr>').join('') + '</table>';
+  const body = sections(d).map(s=>{
+    let h = '<h2>' + esc(s.title) + '</h2>';
+    if(s.text !== undefined) return h + '<p class="notes">' + (esc(s.text) || '—') + '</p>';
+    h += table(s.rows);
+    if(s.items){
+      const rows = (d.itemRows || []).map(r=> '<tr><td>' + esc(r.type) + '</td><td>' + esc(r.qty) + '</td></tr>').join('') || '<tr><td colspan="2" class="muted">No items listed</td></tr>';
+      h += '<table class="items"><tr><th>Item / product model</th><th>Quantity</th></tr>' + rows + '</table>';
+    }
+    if(s.rowsAfter) h += table(s.rowsAfter);
+    return h;
+  }).join('');
+
+  let count = 0;
+  const att = ZONES.map(z=>{
+    const items = d.attachments[z] || [];
+    if(!items.length) return '';
+    return '<h3>' + esc(ZONE_LABEL[z]) + ' (' + items.length + ')</h3><div class="grid">' + items.map(it=>{
+      count++;
+      const nm = esc(it.name), folder = esc(ZONE_LABEL[z].replace(/[\\/:*?"<>|]+/g, '-'));
+      if(isImageItem(it)){
+        return '<figure class="att" data-kind="image" data-name="' + nm + '" data-folder="' + folder + '">' +
+          '<a href="#" class="thumb js-view" title="Click to enlarge"><img src="' + it.dataUrl + '" alt="' + nm + '"></a>' +
+          '<figcaption><span class="name">' + nm + '</span>' +
+          '<span class="acts js-only"><a href="#" class="btn js-view">View</a><a href="#" class="btn solid js-dl">Download</a></span></figcaption></figure>';
+      }
+      return '<figure class="att" data-kind="file" data-name="' + nm + '" data-folder="' + folder + '">' +
+        '<div class="thumb file"><strong>.' + esc(extOf(it.name)) + '</strong><span>' + nm + '</span></div>' +
+        '<figcaption><span class="name">' + nm + '</span>' +
+        '<span class="acts"><a href="#" class="btn js-open js-only">Open</a><a class="btn solid dl" href="' + it.dataUrl + '" download="' + nm + '">Download</a></span></figcaption></figure>';
+    }).join('') + '</div>';
+  }).join('');
+
+  const zipName = 'demo-request-' + safeName(d) + '-' + requestId + '-attachments.zip';
+  const attBlock = count
+    ? '<h2>Attachments</h2><div class="att-head"><p class="muted">Click a photo to see it full size. Every photo and file has its own Download button.</p>' +
+      '<a href="#" class="btn solid big js-only" id="dlAll" data-zip="' + esc(zipName) + '">Download all ' + count + ' files (.zip)</a></div>' + att
+    : '';
+
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>Demo Request ' + esc(requestId) + (d.companyName ? ' — ' + esc(d.companyName) : '') + '</title><style>' +
+    ':root{color-scheme:light}*{box-sizing:border-box}' +
+    'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#26314A;background:#F7F5F0;margin:0;-webkit-text-size-adjust:100%}' +
+    '.top{background:#0f4c5c;color:#fff;padding:22px 20px}.top div{max-width:860px;margin:0 auto}.top h1{margin:0 0 4px;font-size:22px;font-weight:600}.top p{margin:0;font-size:12.5px;color:#cfe3e8}' +
+    '.wrap{max-width:860px;margin:0 auto;padding:20px 20px 40px}' +
+    '.nojs{background:#FCEFE9;border-left:4px solid #c1440e;border-radius:4px;padding:12px 14px;font-size:13px;line-height:1.55;margin-bottom:18px}' +
+    '.sheet{background:#fff;border:1px solid #D9D4C7;border-radius:6px;padding:6px 22px 22px}' +
+    'h2{color:#0f4c5c;font-size:14px;border-bottom:2px solid #0f4c5c;padding-bottom:5px;margin:24px 0 0}' +
+    'h3{color:#0f4c5c;font-size:13px;margin:22px 0 8px}' +
+    'table{width:100%;border-collapse:collapse;margin-top:8px}td,th{padding:7px 8px;border-bottom:1px solid #e2e8f0;font-size:13px;vertical-align:top;text-align:left}td.label{color:#5B6478;width:40%}th{font-size:11.5px;color:#5B6478;font-weight:600}' +
+    '.notes{font-size:13px;white-space:pre-wrap;line-height:1.55}.muted{color:#5B6478;font-size:12.5px}' +
+    '.att-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px}.att-head p{margin:0}' +
+    '.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}' +
+    '.att{margin:0;border:1px solid #D9D4C7;border-radius:6px;overflow:hidden;background:#FAF8F3;display:flex;flex-direction:column;min-width:0}' +
+    '.thumb{display:block;height:150px;background:#eee;cursor:zoom-in}.thumb img{width:100%;height:100%;object-fit:cover;display:block}' +
+    '.thumb.file{cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#0f4c5c;padding:10px;text-align:center;background:#FAF8F3}.thumb.file strong{font-size:22px}.thumb.file span{font-size:11px;color:#5B6478;word-break:break-word}' +
+    'figcaption{padding:9px 10px;display:flex;flex-direction:column;gap:8px;border-top:1px solid #D9D4C7;background:#fff;flex:1}' +
+    '.name{font-size:11.5px;color:#5B6478;word-break:break-word}.acts{display:flex;gap:6px;flex-wrap:wrap}' +
+    '.btn{display:inline-block;text-decoration:none;border:1px solid #0f4c5c;color:#0f4c5c;background:#fff;border-radius:4px;padding:6px 11px;font-size:12.5px;cursor:pointer}.btn:hover{background:#F0F6F7}' +
+    '.btn.solid{background:#0f4c5c;color:#fff}.btn.solid:hover{background:#0a3540}.btn.big{padding:10px 16px;font-size:13.5px}' +
+    '.js-only{display:none!important}.js .js-only{display:inline-flex!important}.js .acts.js-only{display:flex!important}' +
+    '.rem{background:#FCEFE9;border-left:4px solid #c1440e;padding:10px 14px;font-size:12px;border-radius:4px;margin-top:24px;line-height:1.6}' +
+    '.lb{position:fixed;inset:0;background:rgba(15,25,35,.86);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}.lb.show{display:flex}' +
+    '.lb-in{background:#fff;border-radius:8px;padding:16px;max-width:100%;max-height:100%;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative}' +
+    '.lb-in img{max-width:min(92vw,1200px);max-height:72vh;display:block;border-radius:4px}.lb-name{font-size:12.5px;color:#5B6478;margin:0 34px;text-align:center;word-break:break-word}' +
+    '.lb-x{position:absolute;top:6px;right:8px;border:none;background:none;font-size:26px;color:#5B6478;cursor:pointer;line-height:1}' +
+    '@media(max-width:560px){.top,.wrap{padding-left:14px;padding-right:14px}.sheet{padding:4px 14px 18px}td.label{width:45%}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}' +
+    '@media print{.js-only,.acts,#dlAll,.nojs,.lb{display:none!important}body{background:#fff}.sheet{border:none}.att{break-inside:avoid}}' +
+    '</style></head><body>' +
+    '<div class="top"><div><h1>Marketing Material &amp; Demo Request</h1><p>Request ID: ' + esc(requestId) + ' &nbsp;|&nbsp; Submitted by: ' + (esc(d.salesRep) || '—') + ' &nbsp;|&nbsp; Date: ' + (esc(d.requestDate) || '—') + '</p></div></div>' +
+    '<div class="wrap">' +
+    (count ? '<div class="nojs" id="nojs"><strong>The download buttons are switched off in this preview.</strong> Save this attachment, then open it in Chrome, Edge or Safari to view and download the photos and files. On a phone you can still press and hold a photo to save it.</div>' : '') +
+    '<div class="sheet">' + body + attBlock + '<div class="rem">' + esc(REMINDER) + '</div></div></div>' +
+    '<div class="lb" id="lbOverlay" role="dialog" aria-modal="true" aria-labelledby="lbName"><div class="lb-in"><button type="button" class="lb-x" id="lbClose" aria-label="Close">&times;</button>' +
+    '<p class="lb-name" id="lbName"></p><img id="lbImg" alt=""><a href="#" class="btn solid" id="lbDl">Download this photo</a></div></div>' +
+    '<script>(' + reportRuntime.toString() + ')();<\/script>' +
+    '</body></html>';
+}
+
+/* ================= Buttons ================= */
+const pdfBtn = document.getElementById('pdfBtn');
+const packBtn = document.getElementById('packBtn');
+async function runExport(btn, busyLabel, make){
+  if(btn.disabled) return;
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = busyLabel;
+  try{
+    await saveNow();
+    const d = gatherFormData();
+    const {blob, filename} = await make(d);
+    const onSaved = async ()=>{
+      await markSent();
+      setStatus('Saved ' + filename + (blob.size > 20 * 1048576 ? '. It’s ' + fmtSize(blob.size) + ', which may be too big to email.' : '. Send it to marketing.'), blob.size > 20 * 1048576 ? 'err' : 'good');
+    };
+    const r = await deliver(filename, blob, onSaved);
+    if(r.ok && r.pending) setStatus('File ready. Tap Save or share.', 'good');
+    else if(r.ok) await onSaved();
+    else setStatus(r.msg, 'err');
+  }catch(e){
+    setStatus('Couldn’t build the file. Check your internet connection and try again.', 'err');
+  }finally{
+    btn.disabled = false; btn.textContent = label;
+  }
+}
+pdfBtn.onclick = ()=> runExport(pdfBtn, 'Preparing PDF…', async d=>{
+  if(!window.PDFLib) throw new Error('pdf-lib missing');
+  return { blob: await buildPdf(d), filename: 'demo-request-' + safeName(d) + '-' + requestId + '.pdf' };
+});
+packBtn.onclick = ()=> runExport(packBtn, 'Preparing full pack…', async d=>({
+  blob: new Blob([buildPackHTML(d)], {type:'text/html'}),
+  filename: 'demo-request-' + safeName(d) + '-' + requestId + '.html'
+}));
+
+document.addEventListener('keydown', e=>{ if(e.key === 'Escape'){ closeReady(); closeLightbox(); closeRequestsPanel(); } });
+
+/* ================= Start ================= */
+(async function init(){
+  let active = null;
+  try{ active = await Store.get(ACTIVE_KEY); }catch(e){}
+  if(typeof active !== 'string' || !active){
+    const idx = (await getIndex()).sort((a,b)=> b.lastEdited - a.lastEdited);
+    active = idx.length ? idx[0].id : null;
+  }
+  await loadRequest(active || newId());
+})();
+
+})();
+</script>
+
+</body>
+</html>
